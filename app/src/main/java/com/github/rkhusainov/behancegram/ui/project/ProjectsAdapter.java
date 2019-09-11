@@ -1,4 +1,4 @@
-package com.github.rkhusainov.behancegram.ui;
+package com.github.rkhusainov.behancegram.ui.project;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,10 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     private final List<Project> mProjects = new ArrayList<>();
 
-    public ProjectsAdapter() {
+    private final OnItemClickListener mOnItemClickListener;
+
+    public ProjectsAdapter(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -31,7 +34,7 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public void onBindViewHolder(@NonNull ProjectsHolder holder, int position) {
         Project project = mProjects.get(position);
-        holder.bind(project);
+        holder.bind(project, mOnItemClickListener);
     }
 
     @Override
@@ -43,5 +46,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
         mProjects.clear();
         mProjects.addAll(projects);
         notifyDataSetChanged();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(String userName);
     }
 }

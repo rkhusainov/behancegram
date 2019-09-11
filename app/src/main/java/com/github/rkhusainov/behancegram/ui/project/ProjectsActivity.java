@@ -1,4 +1,4 @@
-package com.github.rkhusainov.behancegram.ui;
+package com.github.rkhusainov.behancegram.ui.project;
 
 import androidx.fragment.app.Fragment;
 

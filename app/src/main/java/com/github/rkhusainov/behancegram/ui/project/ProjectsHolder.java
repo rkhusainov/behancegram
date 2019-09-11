@@ -1,4 +1,4 @@
-package com.github.rkhusainov.behancegram.ui;
+package com.github.rkhusainov.behancegram.ui.project;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -30,7 +30,7 @@ public class ProjectsHolder extends RecyclerView.ViewHolder {
         mPublishedOn = itemView.findViewById(R.id.tv_published);
     }
 
-    public void bind(Project project) {
+    public void bind(Project project, ProjectsAdapter.OnItemClickListener onItemClickListener) {
         Picasso.get().load(project.getCover().getPhotoUrl())
                 .fit()
                 .into(mImage);
@@ -38,5 +38,16 @@ public class ProjectsHolder extends RecyclerView.ViewHolder {
         mName.setText(project.getName());
         mUsername.setText(project.getOwners().get(FIRST_OWNER_INDEX).getUsername());
         mPublishedOn.setText(DateUtils.format(project.getPublishedOn()));
+
+        if (onItemClickListener != null) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onItemClickListener.onItemClick(project.getOwners()
+                            .get(FIRST_OWNER_INDEX)
+                            .getUsername());
+                }
+            });
+        }
     }
 }

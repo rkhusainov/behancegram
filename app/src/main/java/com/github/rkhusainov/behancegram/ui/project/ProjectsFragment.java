@@ -1,5 +1,6 @@
-package com.github.rkhusainov.behancegram.ui;
+package com.github.rkhusainov.behancegram.ui.project;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rkhusainov.behancegram.R;
+import com.github.rkhusainov.behancegram.ui.profile.ProfileActivity;
+import com.github.rkhusainov.behancegram.ui.profile.ProfileFragment;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -19,8 +22,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.github.rkhusainov.behancegram.BuildConfig.API_QUERY;
+import static com.github.rkhusainov.behancegram.ui.profile.ProfileActivity.USERNAME_KEY;
+import static com.github.rkhusainov.behancegram.ui.profile.ProfileFragment.PROFILE_KEY;
 
-public class ProjectsFragment extends Fragment {
+public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItemClickListener {
 
     private ProjectsAdapter mProjectsAdapter;
     private RecyclerView mRecyclerView;
@@ -64,9 +69,18 @@ public class ProjectsFragment extends Fragment {
             getActivity().setTitle(R.string.title_projects);
         }
 
-        mProjectsAdapter = new ProjectsAdapter();
+        mProjectsAdapter = new ProjectsAdapter(this);
         mRecyclerView.setAdapter(mProjectsAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onItemClick(String userName) {
+        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+        Bundle args = new Bundle();
+        args.putString(PROFILE_KEY, userName);
+        intent.putExtra(USERNAME_KEY, args);
+        startActivity(intent);
     }
 
     private void getProjects() {
