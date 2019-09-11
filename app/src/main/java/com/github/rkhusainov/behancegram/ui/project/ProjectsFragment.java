@@ -1,5 +1,6 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rkhusainov.behancegram.R;
+import com.github.rkhusainov.behancegram.common.RefreshOwner;
+import com.github.rkhusainov.behancegram.common.Refreshable;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileActivity;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileFragment;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
@@ -25,8 +28,9 @@ import static com.github.rkhusainov.behancegram.BuildConfig.API_QUERY;
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileActivity.USERNAME_KEY;
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileFragment.PROFILE_KEY;
 
-public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItemClickListener {
+public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItemClickListener, Refreshable {
 
+    private RefreshOwner mRefreshOwner;
     private ProjectsAdapter mProjectsAdapter;
     private RecyclerView mRecyclerView;
     private View mErrorView;
@@ -42,9 +46,16 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof RefreshOwner) {
+            mRefreshOwner = (RefreshOwner) context;
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getProjects();
     }
 
     @Nullable
@@ -72,6 +83,13 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
         mProjectsAdapter = new ProjectsAdapter(this);
         mRecyclerView.setAdapter(mProjectsAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        onRefreshData();
+    }
+
+    @Override
+    public void onRefreshData() {
+        getProjects();
     }
 
     @Override
@@ -87,6 +105,8 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
         mDisposable = ApiUtils.getApi().getProjects(API_QUERY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
+                .doFinally(() -> mRefreshOwner.setRefreshState(false))
                 .subscribe(projectResponse -> {
                             mErrorView.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);

@@ -1,5 +1,6 @@
 package com.github.rkhusainov.behancegram.ui.profile;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.rkhusainov.behancegram.R;
+import com.github.rkhusainov.behancegram.common.RefreshOwner;
+import com.github.rkhusainov.behancegram.common.Refreshable;
 import com.github.rkhusainov.behancegram.data.model.user.User;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
@@ -21,10 +24,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements Refreshable {
 
     public static final String PROFILE_KEY = "PROFILE_KEY";
 
+    private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private View mProfileView;
     private String mUsername;
@@ -42,6 +46,13 @@ public class ProfileFragment extends Fragment {
         return fragment;
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof RefreshOwner) {
+            mRefreshOwner = (RefreshOwner) context;
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,16 +91,24 @@ public class ProfileFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().setTitle(mUsername);
         }
-        getProfile();
 
         mProfileView.setVisibility(View.VISIBLE);
 
+        getProfile();
+
+    }
+
+    @Override
+    public void onRefreshData() {
+        getProfile();
     }
 
     void getProfile() {
         mDisposable = ApiUtils.getApi().getUserInfo(mUsername)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
+                .doFinally(() -> mRefreshOwner.setRefreshState(false))
                 .subscribe(userResponse -> {
                     mErrorView.setVisibility(View.GONE);
                     mProfileView.setVisibility(View.VISIBLE);
