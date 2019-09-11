@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.common.RefreshOwner;
 import com.github.rkhusainov.behancegram.common.Refreshable;
+import com.github.rkhusainov.behancegram.data.Storage;
 import com.github.rkhusainov.behancegram.data.model.user.User;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
@@ -28,6 +29,7 @@ public class ProfileFragment extends Fragment implements Refreshable {
 
     public static final String PROFILE_KEY = "PROFILE_KEY";
 
+    private Storage mStorage;
     private RefreshOwner mRefreshOwner;
     private View mErrorView;
     private View mProfileView;
@@ -49,6 +51,11 @@ public class ProfileFragment extends Fragment implements Refreshable {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        if (context instanceof Storage.StorageOwner) {
+            mStorage = ((Storage.StorageOwner) context).obtainStorage();
+        }
+
         if (context instanceof RefreshOwner) {
             mRefreshOwner = (RefreshOwner) context;
         }
@@ -106,6 +113,9 @@ public class ProfileFragment extends Fragment implements Refreshable {
     void getProfile() {
         mDisposable = ApiUtils.getApi().getUserInfo(mUsername)
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(response -> mStorage.insertUser(response))
+                .onErrorReturn(throwable ->
+                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getUser(mUsername) : null)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
                 .doFinally(() -> mRefreshOwner.setRefreshState(false))

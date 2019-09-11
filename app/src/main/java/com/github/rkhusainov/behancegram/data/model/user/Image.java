@@ -1,16 +1,29 @@
 package com.github.rkhusainov.behancegram.data.model.user;
 
 import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+@Entity(foreignKeys = @ForeignKey(
+        entity = User.class,
+        parentColumns = "id",
+        childColumns = "user_id"
+))
 public class Image {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     private int mId;
 
+    @ColumnInfo(name = "photo_url")
     @SerializedName("230")
     private String mPhotoUrl;
 
+    @ColumnInfo(name = "user_id")
     private int mUserId;
 
     public int getId() {

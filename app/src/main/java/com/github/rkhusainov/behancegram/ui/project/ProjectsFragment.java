@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.common.RefreshOwner;
 import com.github.rkhusainov.behancegram.common.Refreshable;
+import com.github.rkhusainov.behancegram.data.Storage;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileActivity;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileFragment;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
@@ -31,6 +32,7 @@ import static com.github.rkhusainov.behancegram.ui.profile.ProfileFragment.PROFI
 public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItemClickListener, Refreshable {
 
     private RefreshOwner mRefreshOwner;
+    private Storage mStorage;
     private ProjectsAdapter mProjectsAdapter;
     private RecyclerView mRecyclerView;
     private View mErrorView;
@@ -48,6 +50,11 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        if (context instanceof Storage.StorageOwner) {
+            mStorage = ((Storage.StorageOwner) context).obtainStorage();
+        }
+
         if (context instanceof RefreshOwner) {
             mRefreshOwner = (RefreshOwner) context;
         }
@@ -104,6 +111,9 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
     private void getProjects() {
         mDisposable = ApiUtils.getApi().getProjects(API_QUERY)
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(response -> mStorage.insertProjects(response))
+                .onErrorReturn(throwable ->
+                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
                 .doFinally(() -> mRefreshOwner.setRefreshState(false))
@@ -121,6 +131,8 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
     @Override
     public void onDetach() {
         super.onDetach();
+        mStorage = null;
+        mRefreshOwner = null;
         if (mDisposable != null) {
             mDisposable.dispose();
         }

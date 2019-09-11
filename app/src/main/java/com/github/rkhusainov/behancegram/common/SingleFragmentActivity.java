@@ -7,9 +7,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 
+import com.github.rkhusainov.behancegram.AppDelegate;
 import com.github.rkhusainov.behancegram.R;
+import com.github.rkhusainov.behancegram.data.Storage;
 
-public abstract class SingleFragmentActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, RefreshOwner {
+public abstract class SingleFragmentActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Storage.StorageOwner, RefreshOwner {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -45,5 +47,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     @Override
     public void setRefreshState(boolean refreshing) {
         mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(refreshing));
+    }
+
+    @Override
+    public Storage obtainStorage() {
+        return ((AppDelegate) getApplicationContext()).getStorage();
     }
 }

@@ -1,25 +1,38 @@
 package com.github.rkhusainov.behancegram.data.model.user;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class User {
+
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     @SerializedName("id")
     private int mId;
 
+    @ColumnInfo(name = "username")
     @SerializedName("username")
     private String mUsername;
 
+    @ColumnInfo(name = "location")
     @SerializedName("location")
     private String mLocation;
 
+    @ColumnInfo(name = "created_on")
     @SerializedName("created_on")
     private long mCreatedOn;
 
     @SerializedName("images")
+    @Ignore
     private Image mImage;
 
+    @ColumnInfo(name = "display_name")
     @SerializedName("display_name")
     private String mDisplayName;
 

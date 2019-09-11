@@ -1,27 +1,38 @@
 package com.github.rkhusainov.behancegram.data.model.project;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.List;
 
+@Entity
 public class Project implements Serializable {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     @SerializedName("id")
     private int mId;
 
+    @ColumnInfo(name = "name")
     @SerializedName("name")
     private String mName;
 
+    @ColumnInfo(name = "published_on")
     @SerializedName("published_on")
     private long mPublishedOn;
 
     @SerializedName("covers")
+    @Ignore
     private Cover mCover;
 
     @SerializedName("owners")
+    @Ignore
     private List<Owner> mOwners;
 
     public int getId() {

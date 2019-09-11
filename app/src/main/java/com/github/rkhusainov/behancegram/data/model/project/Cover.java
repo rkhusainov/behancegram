@@ -1,18 +1,30 @@
 package com.github.rkhusainov.behancegram.data.model.project;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+@Entity(foreignKeys = @ForeignKey(
+        entity = Project.class,
+        parentColumns = "id",
+        childColumns = "project_id"))
 public class Cover implements Serializable {
 
+    @PrimaryKey
+    @ColumnInfo(name = "id")
     private int mId;
 
+    @ColumnInfo(name = "photo_url")
     @SerializedName("202")
     private String mPhotoUrl;
 
+    @ColumnInfo(name = "project_id")
     private int mProjectId;
 
     public int getId() {

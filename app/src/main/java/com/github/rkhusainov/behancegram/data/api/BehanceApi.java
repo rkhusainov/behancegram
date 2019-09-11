@@ -13,6 +13,6 @@ public interface BehanceApi {
     Single<ProjectResponse> getProjects(@Query("q") String query);
 
     @GET("v2/users/{username}")
-    Single<UserResponse> getUserInfo(@Path("username") String userName);
+    Single<UserResponse> getUserInfo(@Path("username") String username);
 
 }
