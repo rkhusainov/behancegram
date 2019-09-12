@@ -10,33 +10,29 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rkhusainov.behancegram.R;
-import com.github.rkhusainov.behancegram.common.RefreshOwner;
-import com.github.rkhusainov.behancegram.common.Refreshable;
 import com.github.rkhusainov.behancegram.data.Storage;
+import com.github.rkhusainov.behancegram.databinding.ProjectsBinding;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileActivity;
-import com.github.rkhusainov.behancegram.ui.profile.ProfileFragment;
-import com.github.rkhusainov.behancegram.utils.ApiUtils;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-
-import static com.github.rkhusainov.behancegram.BuildConfig.API_QUERY;
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileActivity.USERNAME_KEY;
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileFragment.PROFILE_KEY;
 
-public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItemClickListener, Refreshable {
+public class ProjectsFragment extends Fragment {
 
-    private RefreshOwner mRefreshOwner;
-    private Storage mStorage;
-    private ProjectsAdapter mProjectsAdapter;
-    private RecyclerView mRecyclerView;
-    private View mErrorView;
-    private Disposable mDisposable;
+    private ProjectsViewModel mProjectsViewModel;
+    private ProjectsAdapter.OnItemClickListener mOnItemClickListener = new ProjectsAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClick(String userName) {
+            Intent intent = new Intent(getActivity(), ProfileActivity.class);
+            Bundle args = new Bundle();
+            args.putString(PROFILE_KEY, userName);
+            intent.putExtra(USERNAME_KEY, args);
+            startActivity(intent);
+
+        }
+    };
 
     public static ProjectsFragment newInstance() {
 
@@ -52,11 +48,8 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
         super.onAttach(context);
 
         if (context instanceof Storage.StorageOwner) {
-            mStorage = ((Storage.StorageOwner) context).obtainStorage();
-        }
-
-        if (context instanceof RefreshOwner) {
-            mRefreshOwner = (RefreshOwner) context;
+            Storage storage = ((Storage.StorageOwner) context).obtainStorage();
+            mProjectsViewModel = new ProjectsViewModel(storage, mOnItemClickListener);
         }
     }
 
@@ -68,15 +61,15 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fr_projects, container, false);
+
+        ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
+        binding.setVm(mProjectsViewModel);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mRecyclerView = view.findViewById(R.id.recycler);
-        mErrorView = view.findViewById(R.id.errorView);
     }
 
     @Override
@@ -86,55 +79,13 @@ public class ProjectsFragment extends Fragment implements ProjectsAdapter.OnItem
         if (getActivity() != null) {
             getActivity().setTitle(R.string.title_projects);
         }
-
-        mProjectsAdapter = new ProjectsAdapter(this);
-        mRecyclerView.setAdapter(mProjectsAdapter);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        onRefreshData();
+        mProjectsViewModel.loadProjects();
     }
 
-    @Override
-    public void onRefreshData() {
-        getProjects();
-    }
-
-    @Override
-    public void onItemClick(String userName) {
-        Intent intent = new Intent(getActivity(), ProfileActivity.class);
-        Bundle args = new Bundle();
-        args.putString(PROFILE_KEY, userName);
-        intent.putExtra(USERNAME_KEY, args);
-        startActivity(intent);
-    }
-
-    private void getProjects() {
-        mDisposable = ApiUtils.getApi().getProjects(API_QUERY)
-                .subscribeOn(Schedulers.io())
-                .doOnSuccess(response -> mStorage.insertProjects(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
-                .doFinally(() -> mRefreshOwner.setRefreshState(false))
-                .subscribe(projectResponse -> {
-                            mErrorView.setVisibility(View.GONE);
-                            mRecyclerView.setVisibility(View.VISIBLE);
-                            mProjectsAdapter.addData(projectResponse.getProjects());
-                        },
-                        throwable -> {
-                            mErrorView.setVisibility(View.VISIBLE);
-                            mRecyclerView.setVisibility(View.GONE);
-                        });
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mStorage = null;
-        mRefreshOwner = null;
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
+        mProjectsViewModel.dispatchDetach();
     }
 }

@@ -11,9 +11,7 @@ import com.github.rkhusainov.behancegram.AppDelegate;
 import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.data.Storage;
 
-public abstract class SingleFragmentActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, Storage.StorageOwner, RefreshOwner {
-
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+public abstract class SingleFragmentActivity extends AppCompatActivity implements Storage.StorageOwner {
 
     protected abstract Fragment getFragment();
 
@@ -21,8 +19,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_swipe_container);
-        mSwipeRefreshLayout = findViewById(R.id.refresher);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
 
         if (savedInstanceState == null) {
             changeFragment(getFragment());
@@ -36,18 +32,18 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 .commit();
     }
 
-    @Override
-    public void onRefresh() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
-        if (fragment instanceof Refreshable) {
-            ((Refreshable) fragment).onRefreshData();
-        }
-    }
+//    @Override
+//    public void onRefresh() {
+//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+//        if (fragment instanceof Refreshable) {
+//            ((Refreshable) fragment).onRefreshData();
+//        }
+//    }
 
-    @Override
-    public void setRefreshState(boolean refreshing) {
-        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(refreshing));
-    }
+//    @Override
+//    public void setRefreshState(boolean refreshing) {
+//        mSwipeRefreshLayout.post(() -> mSwipeRefreshLayout.setRefreshing(refreshing));
+//    }
 
     @Override
     public Storage obtainStorage() {

@@ -25,7 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class ProfileFragment extends Fragment implements Refreshable {
+public class ProfileFragment extends Fragment {
 
     public static final String PROFILE_KEY = "PROFILE_KEY";
 
@@ -54,10 +54,6 @@ public class ProfileFragment extends Fragment implements Refreshable {
 
         if (context instanceof Storage.StorageOwner) {
             mStorage = ((Storage.StorageOwner) context).obtainStorage();
-        }
-
-        if (context instanceof RefreshOwner) {
-            mRefreshOwner = (RefreshOwner) context;
         }
     }
 
@@ -105,10 +101,6 @@ public class ProfileFragment extends Fragment implements Refreshable {
 
     }
 
-    @Override
-    public void onRefreshData() {
-        getProfile();
-    }
 
     void getProfile() {
         mDisposable = ApiUtils.getApi().getUserInfo(mUsername)

@@ -11,16 +11,16 @@ import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.data.model.project.Project;
 import com.github.rkhusainov.behancegram.databinding.ProjectBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
-    private final List<Project> mProjects = new ArrayList<>();
+    private final List<Project> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
 
-    public ProjectsAdapter(OnItemClickListener onItemClickListener) {
+    public ProjectsAdapter(List<Project> projects, OnItemClickListener onItemClickListener) {
+        mProjects = projects;
         mOnItemClickListener = onItemClickListener;
     }
 
@@ -43,12 +43,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public int getItemCount() {
         return mProjects.size();
-    }
-
-    public void addData(List<Project> projects) {
-        mProjects.clear();
-        mProjects.addAll(projects);
-        notifyDataSetChanged();
     }
 
     public interface OnItemClickListener {
