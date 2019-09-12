@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.data.model.project.Project;
+import com.github.rkhusainov.behancegram.databinding.ProjectBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,8 @@ import java.util.List;
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     private final List<Project> mProjects = new ArrayList<>();
-
     private final OnItemClickListener mOnItemClickListener;
+
 
     public ProjectsAdapter(OnItemClickListener onItemClickListener) {
         mOnItemClickListener = onItemClickListener;
@@ -28,7 +29,9 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     public ProjectsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.li_projects, parent, false);
-        return new ProjectsHolder(view);
+
+        ProjectBinding binding = ProjectBinding.inflate(inflater, parent, false);
+        return new ProjectsHolder(binding);
     }
 
     @Override
