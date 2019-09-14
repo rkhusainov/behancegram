@@ -1,12 +1,15 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
-import androidx.databinding.ObservableArrayList;
-import androidx.databinding.ObservableBoolean;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.rkhusainov.behancegram.data.Storage;
 import com.github.rkhusainov.behancegram.data.model.project.Project;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -14,15 +17,15 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.github.rkhusainov.behancegram.BuildConfig.API_QUERY;
 
-public class ProjectsViewModel {
+public class ProjectsViewModel extends ViewModel {
 
     private Storage mStorage;
     private ProjectsAdapter.OnItemClickListener mListener;
     private Disposable mDisposable;
 
-    private ObservableBoolean mIsLoading = new ObservableBoolean(false);
-    private ObservableBoolean mIsErrorVisible = new ObservableBoolean(false);
-    private ObservableArrayList<Project> mProjects = new ObservableArrayList<>();
+    private MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
+    private MutableLiveData<List<Project>> mProjects = new MutableLiveData<>();
     private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
@@ -34,6 +37,8 @@ public class ProjectsViewModel {
     public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener listener) {
         mStorage = storage;
         mListener = listener;
+        mProjects.setValue(new ArrayList<>());
+        loadProjects();
     }
 
     public void loadProjects() {
@@ -43,19 +48,20 @@ public class ProjectsViewModel {
                 .onErrorReturn(throwable ->
                         ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mIsLoading.set(true))
-                .doFinally(() -> mIsLoading.set(false))
+                .doOnSubscribe(disposable -> mIsLoading.postValue(true))
+                .doFinally(() -> mIsLoading.postValue(false))
                 .subscribe(projectResponse -> {
-                            mIsErrorVisible.set(false);
-                            mProjects.addAll(projectResponse.getProjects());
+                            mIsErrorVisible.postValue(false);
+                            mProjects.postValue(projectResponse.getProjects());
                         },
                         throwable -> {
-                            mIsErrorVisible.set(true);
+                            mIsErrorVisible.postValue(true);
                         });
 
     }
 
-    public void dispatchDetach() {
+    @Override
+    public void onCleared() {
         mStorage = null;
         if (mDisposable != null) {
             mDisposable.dispose();
@@ -66,15 +72,15 @@ public class ProjectsViewModel {
         return mListener;
     }
 
-    public ObservableBoolean getIsLoading() {
+    public MutableLiveData<Boolean> getIsLoading() {
         return mIsLoading;
     }
 
-    public ObservableBoolean getIsErrorVisible() {
+    public MutableLiveData<Boolean> getIsErrorVisible() {
         return mIsErrorVisible;
     }
 
-    public ObservableArrayList<Project> getProjects() {
+    public MutableLiveData<List<Project>> getProjects() {
         return mProjects;
     }
 

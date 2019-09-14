@@ -32,6 +32,4 @@ public class CustomBindingAdapter {
         refreshLayout.setOnRefreshListener(listener);
         refreshLayout.post(() -> refreshLayout.setRefreshing(isLoading));
     }
-
-
 }

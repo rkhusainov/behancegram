@@ -10,11 +10,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.github.rkhusainov.behancegram.R;
 import com.github.rkhusainov.behancegram.data.Storage;
 import com.github.rkhusainov.behancegram.databinding.ProjectsBinding;
 import com.github.rkhusainov.behancegram.ui.profile.ProfileActivity;
+import com.github.rkhusainov.behancegram.utils.CustomFactory;
 
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileActivity.USERNAME_KEY;
 import static com.github.rkhusainov.behancegram.ui.profile.ProfileFragment.PROFILE_KEY;
@@ -30,14 +31,11 @@ public class ProjectsFragment extends Fragment {
             args.putString(PROFILE_KEY, userName);
             intent.putExtra(USERNAME_KEY, args);
             startActivity(intent);
-
         }
     };
 
     public static ProjectsFragment newInstance() {
-
         Bundle args = new Bundle();
-
         ProjectsFragment fragment = new ProjectsFragment();
         fragment.setArguments(args);
         return fragment;
@@ -49,13 +47,9 @@ public class ProjectsFragment extends Fragment {
 
         if (context instanceof Storage.StorageOwner) {
             Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            mProjectsViewModel = new ProjectsViewModel(storage, mOnItemClickListener);
+            CustomFactory customFactory = new CustomFactory(storage, mOnItemClickListener);
+            mProjectsViewModel = new ViewModelProvider(this, customFactory).get(ProjectsViewModel.class);
         }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Nullable
@@ -64,28 +58,7 @@ public class ProjectsFragment extends Fragment {
 
         ProjectsBinding binding = ProjectsBinding.inflate(inflater, container, false);
         binding.setVm(mProjectsViewModel);
+        binding.setLifecycleOwner(this);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (getActivity() != null) {
-            getActivity().setTitle(R.string.title_projects);
-        }
-        mProjectsViewModel.loadProjects();
-    }
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mProjectsViewModel.dispatchDetach();
     }
 }
