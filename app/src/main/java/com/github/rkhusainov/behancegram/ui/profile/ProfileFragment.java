@@ -17,6 +17,7 @@ import com.github.rkhusainov.behancegram.common.RefreshOwner;
 import com.github.rkhusainov.behancegram.common.Refreshable;
 import com.github.rkhusainov.behancegram.data.Storage;
 import com.github.rkhusainov.behancegram.data.model.user.User;
+import com.github.rkhusainov.behancegram.databinding.ProfileBinding;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
 import com.squareup.picasso.Picasso;
@@ -29,17 +30,10 @@ public class ProfileFragment extends Fragment {
 
     public static final String PROFILE_KEY = "PROFILE_KEY";
 
-    private Storage mStorage;
-    private RefreshOwner mRefreshOwner;
-    private View mErrorView;
-    private View mProfileView;
     private String mUsername;
-    private Disposable mDisposable;
-
-    private ImageView mProfileImage;
-    private TextView mProfileName;
-    private TextView mProfileCreatedOn;
-    private TextView mProfileLocation;
+    private Storage mStorage;
+    private ProfileViewModel mProfileViewModel;
+    private ProfileBinding mProfileBinding;
 
     public static ProfileFragment newInstance(Bundle args) {
 
@@ -66,21 +60,13 @@ public class ProfileFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fr_profile, container, false);
+        mProfileBinding = ProfileBinding.inflate(inflater, container, false);
+        return mProfileBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mErrorView = view.findViewById(R.id.errorView);
-        mProfileView = view.findViewById(R.id.view_profile);
-
-        mProfileImage = view.findViewById(R.id.iv_profile);
-        mProfileName = view.findViewById(R.id.tv_display_name_details);
-        mProfileCreatedOn = view.findViewById(R.id.tv_created_on_details);
-        mProfileLocation = view.findViewById(R.id.tv_location_details);
-
     }
 
     @Override
@@ -95,47 +81,17 @@ public class ProfileFragment extends Fragment {
             getActivity().setTitle(mUsername);
         }
 
-        mProfileView.setVisibility(View.VISIBLE);
+        mProfileViewModel = new ProfileViewModel(mStorage, mUsername);
+        mProfileBinding.setVm(mProfileViewModel);
 
-        getProfile();
+        mProfileViewModel.getProfile();
 
     }
 
-
-    void getProfile() {
-        mDisposable = ApiUtils.getApi().getUserInfo(mUsername)
-                .subscribeOn(Schedulers.io())
-                .doOnSuccess(response -> mStorage.insertUser(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getUser(mUsername) : null)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(disposable -> mRefreshOwner.setRefreshState(true))
-                .doFinally(() -> mRefreshOwner.setRefreshState(false))
-                .subscribe(userResponse -> {
-                    mErrorView.setVisibility(View.GONE);
-                    mProfileView.setVisibility(View.VISIBLE);
-                    bind(userResponse.getUser());
-                }, throwable -> {
-                    mErrorView.setVisibility(View.VISIBLE);
-                    mProfileView.setVisibility(View.GONE);
-                });
-    }
-
-    private void bind(User user) {
-        Picasso.get().load(user.getImage().getPhotoUrl())
-                .fit()
-                .into(mProfileImage);
-
-        mProfileName.setText(user.getDisplayName());
-        mProfileCreatedOn.setText(DateUtils.format(user.getCreatedOn()));
-        mProfileLocation.setText(user.getLocation());
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
+        mProfileViewModel.onDispatchDetach();
     }
 }

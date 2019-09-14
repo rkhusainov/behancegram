@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
 
-    <include
-        layout="@layout/v_profile"
-        android:visibility="gone" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <include
-        layout="@layout/v_error"
-        android:visibility="gone" />
+    <data class="ProfileBinding">
 
-</LinearLayout>
+        <import
+            alias="V"
+            type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.github.rkhusainov.behancegram.ui.profile.ProfileViewModel" />
+
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        bind:onRefresh="@{vm.refreshListener}"
+        bind:refreshState="@{vm.isLoading}">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                layout="@layout/v_profile"
+                android:visibility="@{vm.isErrorVisible ? V.GONE : V.VISIBLE}"
+                bind:profile="@{vm}" />
+
+            <include
+                layout="@layout/v_error"
+                android:visibility="@{vm.isErrorVisible ? V.VISIBLE : V.GONE}" />
+
+        </LinearLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</layout>
