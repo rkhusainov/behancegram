@@ -1,6 +1,6 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
-import com.github.rkhusainov.behancegram.data.model.project.Project;
+import com.github.rkhusainov.behancegram.data.model.project.FullProject;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
 
 public class ProjectItemListViewModel {
@@ -12,13 +12,15 @@ public class ProjectItemListViewModel {
     private String mUsername;
     private String mPublishedOn;
 
-    public ProjectItemListViewModel(Project project) {
-        mImageUrl = project.getCover().getPhotoUrl();
-        mName = project.getName();
-        mUsername = project.getOwners().get(FIRST_OWNER_INDEX).getUsername();
-        mPublishedOn = DateUtils.format(project.getPublishedOn());
+    public ProjectItemListViewModel(FullProject fullProject) {
+        mImageUrl = fullProject.mProject.getCover().getPhotoUrl();
+        mName = fullProject.mProject.getName();
+        mPublishedOn = DateUtils.format(fullProject.mProject.getPublishedOn());
+        // mOwners is relation so it maybe not available and we need to check
+        if (fullProject.mOwners != null && fullProject.mOwners.size() != 0) {
+            mUsername = fullProject.mOwners.get(FIRST_OWNER_INDEX).getUsername();
+        }
     }
-
 
     public String getImageUrl() {
         return mImageUrl;

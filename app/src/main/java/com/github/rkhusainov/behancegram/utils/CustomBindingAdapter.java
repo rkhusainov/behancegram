@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.github.rkhusainov.behancegram.data.model.project.Project;
+import com.github.rkhusainov.behancegram.data.model.project.FullProject;
 import com.github.rkhusainov.behancegram.ui.project.ProjectsAdapter;
 import com.squareup.picasso.Picasso;
 
@@ -21,14 +21,14 @@ public class CustomBindingAdapter {
     }
 
     @BindingAdapter({"bind:data", "bind:clickHandler"})
-    public static void configureRecyclerView(RecyclerView recyclerView, List<Project> projects, ProjectsAdapter.OnItemClickListener listener) {
+    public static void configureRecyclerView(RecyclerView recyclerView, List<FullProject> projects, ProjectsAdapter.OnItemClickListener listener) {
         ProjectsAdapter adapter = new ProjectsAdapter(projects, listener);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(adapter);
     }
 
     @BindingAdapter({"bind:refreshState", "bind:onRefresh"})
-    public static void configureSwipreRefreshLayout(SwipeRefreshLayout refreshLayout, boolean isLoading, SwipeRefreshLayout.OnRefreshListener listener) {
+    public static void configureSwipeRefreshLayout(SwipeRefreshLayout refreshLayout, boolean isLoading, SwipeRefreshLayout.OnRefreshListener listener) {
         refreshLayout.setOnRefreshListener(listener);
         refreshLayout.post(() -> refreshLayout.setRefreshing(isLoading));
     }

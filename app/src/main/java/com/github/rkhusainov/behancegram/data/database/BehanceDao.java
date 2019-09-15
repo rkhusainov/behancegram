@@ -1,11 +1,13 @@
 package com.github.rkhusainov.behancegram.data.database;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.github.rkhusainov.behancegram.data.model.project.Cover;
+import com.github.rkhusainov.behancegram.data.model.project.FullProject;
 import com.github.rkhusainov.behancegram.data.model.project.Owner;
 import com.github.rkhusainov.behancegram.data.model.project.Project;
 import com.github.rkhusainov.behancegram.data.model.user.Image;
@@ -32,13 +34,12 @@ public interface BehanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertImage(Image image);
 
+    //Gets
     @Query("select * from project")
     List<Project> getProjects();
 
-
-    //Gets
-    @Query("select * from cover where project_id = :projectId")
-    Cover getCoverFromProject(int projectId);
+    @Query("select * from project order by published_on desc")
+    LiveData<List<FullProject>> getProjectsLive();
 
     @Query("select * from owner where project_id = :projectId")
     List<Owner> getOwnersFromProject(int projectId);

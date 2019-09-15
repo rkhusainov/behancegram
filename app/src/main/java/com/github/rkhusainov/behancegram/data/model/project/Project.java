@@ -2,6 +2,7 @@ package com.github.rkhusainov.behancegram.data.model.project;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -28,7 +29,7 @@ public class Project implements Serializable {
     private long mPublishedOn;
 
     @SerializedName("covers")
-    @Ignore
+    @Embedded
     private Cover mCover;
 
     @SerializedName("owners")

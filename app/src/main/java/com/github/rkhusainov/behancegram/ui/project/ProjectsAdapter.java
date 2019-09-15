@@ -1,25 +1,23 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.github.rkhusainov.behancegram.R;
-import com.github.rkhusainov.behancegram.data.model.project.Project;
+import com.github.rkhusainov.behancegram.data.model.project.FullProject;
 import com.github.rkhusainov.behancegram.databinding.ProjectBinding;
 
 import java.util.List;
 
 public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
-    private final List<Project> mProjects;
+    private final List<FullProject> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
 
-    public ProjectsAdapter(List<Project> projects, OnItemClickListener onItemClickListener) {
+    public ProjectsAdapter(List<FullProject> projects, OnItemClickListener onItemClickListener) {
         mProjects = projects;
         mOnItemClickListener = onItemClickListener;
     }
@@ -28,7 +26,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
     @Override
     public ProjectsHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-//        View view = inflater.inflate(R.layout.li_projects, parent, false);
 
         ProjectBinding binding = ProjectBinding.inflate(inflater, parent, false);
         return new ProjectsHolder(binding);
@@ -36,13 +33,14 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ProjectsHolder holder, int position) {
-        Project project = mProjects.get(position);
-        holder.bind(project, mOnItemClickListener);
+        FullProject fullProject = mProjects.get(position);
+        holder.bind(fullProject, mOnItemClickListener);
     }
 
     @Override
     public int getItemCount() {
-        return mProjects.size();
+        // mProjects from database maybe null so we need check it for null
+        return mProjects == null ? 0 : mProjects.size();
     }
 
     public interface OnItemClickListener {
