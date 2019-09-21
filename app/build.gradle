@@ -14,6 +14,12 @@ android {
         buildConfigField "String", "API_URL", '"https://www.behance.net/"'
         buildConfigField "String", "API_KEY", '"l7gojXuylIZW3djPk4sEjLzREW64DGnB"'
         buildConfigField "String", "API_QUERY", '"motorcycle"'
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ toothpick_registry_package_name : 'com.github.rkhusainov.behancegram' ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -51,8 +57,12 @@ dependencies {
     implementation "androidx.room:room-runtime:2.2.0-rc01"
     annotationProcessor "androidx.room:room-compiler:2.2.0-rc01"
 
-
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //toothpick
+    implementation 'com.github.stephanenicolas.toothpick:toothpick-runtime:3.1.0'
+    implementation 'com.github.stephanenicolas.toothpick:smoothie-androidx:3.1.0'
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:3.1.0'
 
     // tests
     testImplementation 'junit:junit:4.12'

@@ -5,8 +5,11 @@ import androidx.databinding.ObservableBoolean;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.rkhusainov.behancegram.data.Storage;
+import com.github.rkhusainov.behancegram.data.api.BehanceApi;
 import com.github.rkhusainov.behancegram.data.model.project.Project;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -16,8 +19,12 @@ import static com.github.rkhusainov.behancegram.BuildConfig.API_QUERY;
 
 public class ProjectsViewModel {
 
-    private Storage mStorage;
-    private ProjectsAdapter.OnItemClickListener mListener;
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
+
+    private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
     private Disposable mDisposable;
 
     private ObservableBoolean mIsLoading = new ObservableBoolean(false);
@@ -30,40 +37,34 @@ public class ProjectsViewModel {
         }
     };
 
-
-    public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener listener) {
-        mStorage = storage;
-        mListener = listener;
+    @Inject
+    public ProjectsViewModel() {
     }
 
+
     public void loadProjects() {
-        mDisposable = ApiUtils.getApi().getProjects(API_QUERY)
-                .subscribeOn(Schedulers.io())
+        mDisposable = mApi.getProjects(API_QUERY)
                 .doOnSuccess(response -> mStorage.insertProjects(response))
                 .onErrorReturn(throwable ->
                         ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mIsLoading.set(true))
                 .doFinally(() -> mIsLoading.set(false))
                 .subscribe(projectResponse -> {
                             mIsErrorVisible.set(false);
+                            if (!mProjects.isEmpty()) {
+                                mProjects.clear();
+                            }
                             mProjects.addAll(projectResponse.getProjects());
                         },
                         throwable -> {
                             mIsErrorVisible.set(true);
                         });
-
     }
 
-    public void dispatchDetach() {
-        mStorage = null;
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
-    }
-
-    public ProjectsAdapter.OnItemClickListener getListener() {
-        return mListener;
+    public ProjectsAdapter.OnItemClickListener getOnItemClickListener() {
+        return mOnItemClickListener;
     }
 
     public ObservableBoolean getIsLoading() {
@@ -80,5 +81,16 @@ public class ProjectsViewModel {
 
     public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {
         return mOnRefreshListener;
+    }
+
+    public void setOnClickListener(ProjectsAdapter.OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    public void dispatchDetach() {
+        mStorage = null;
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
     }
 }

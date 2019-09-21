@@ -5,9 +5,12 @@ import androidx.databinding.ObservableField;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.rkhusainov.behancegram.data.Storage;
+import com.github.rkhusainov.behancegram.data.api.BehanceApi;
 import com.github.rkhusainov.behancegram.data.model.user.User;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
+
+import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -15,13 +18,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ProfileViewModel {
 
+    @Inject
+    Storage mStorage;
+    @Inject
+    BehanceApi mApi;
     private Disposable mDisposable;
-    private Storage mStorage;
     private String mUsername;
     private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            getProfile();
+            loadProfile();
         }
     };
 
@@ -32,14 +38,16 @@ public class ProfileViewModel {
     private ObservableField<String> mProfileLocation = new ObservableField<>();
     private ObservableField<String> mProfileImageUrl = new ObservableField<>();
 
+    @Inject
+    public ProfileViewModel() {
+    }
 
-    public ProfileViewModel(Storage storage, String username) {
-        mStorage = storage;
+    public void setUsername(String username) {
         mUsername = username;
     }
 
-    void getProfile() {
-        mDisposable = ApiUtils.getApi().getUserInfo(mUsername)
+    void loadProfile() {
+        mDisposable = mApi.getUserInfo(mUsername)
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(response -> mStorage.insertUser(response))
                 .onErrorReturn(throwable ->
@@ -60,12 +68,6 @@ public class ProfileViewModel {
         mProfileCreatedOn.set(DateUtils.format(user.getCreatedOn()));
         mProfileLocation.set(user.getLocation());
         mProfileImageUrl.set(user.getImage().getPhotoUrl());
-    }
-
-    public void onDispatchDetach() {
-        if (mDisposable != null) {
-            mDisposable.dispose();
-        }
     }
 
     public SwipeRefreshLayout.OnRefreshListener getRefreshListener() {
@@ -94,5 +96,11 @@ public class ProfileViewModel {
 
     public ObservableField<String> getProfileImageUrl() {
         return mProfileImageUrl;
+    }
+
+    public void onDispatchDetach() {
+        if (mDisposable != null) {
+            mDisposable.dispose();
+        }
     }
 }

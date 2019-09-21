@@ -32,11 +32,11 @@ public interface BehanceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertImage(Image image);
 
-    @Query("select * from project")
-    List<Project> getProjects();
-
 
     //Gets
+    @Query("select * from project order by published_on desc")
+    List<Project> getProjects();
+
     @Query("select * from cover where project_id = :projectId")
     Cover getCoverFromProject(int projectId);
 
@@ -54,4 +54,10 @@ public interface BehanceDao {
 
     @Query("select * from image")
     List<Image> getImages();
+
+    @Query("delete from owner")
+    void clearOwnerTable();
+
+    @Query("delete from cover")
+    void clearCoverTable();
 }

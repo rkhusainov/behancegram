@@ -39,7 +39,9 @@ public class Storage {
             owners.add(owner);
         }
 
+        mBehanceDao.clearCoverTable();
         mBehanceDao.insertCovers(covers);
+        mBehanceDao.clearOwnerTable();
         mBehanceDao.insertOwners(owners);
     }
 
