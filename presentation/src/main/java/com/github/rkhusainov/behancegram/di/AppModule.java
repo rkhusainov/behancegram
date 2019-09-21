@@ -3,7 +3,7 @@ package com.github.rkhusainov.behancegram.di;
 import androidx.room.Room;
 
 import com.github.rkhusainov.behancegram.AppDelegate;
-import com.github.rkhusainov.data.Storage;
+import com.github.rkhusainov.data.database.BehanceDao;
 import com.github.rkhusainov.data.database.BehanceDatabase;
 
 import toothpick.config.Module;
@@ -15,18 +15,28 @@ public class AppModule extends Module {
     public AppModule(AppDelegate app) {
         mApp = app;
         bind(AppDelegate.class).toInstance(mApp);
-        bind(Storage.class).toInstance(provideStorage());
+        bind(BehanceDao.class).toInstance(provideStorage());
     }
 
     AppDelegate provideApp() {
         return mApp;
     }
 
-    Storage provideStorage() {
+    BehanceDao provideStorage() {
         final BehanceDatabase database = Room.databaseBuilder(mApp, BehanceDatabase.class, "behance_database")
                 .fallbackToDestructiveMigration()
                 .build();
 
-        return new Storage(database.getBehanceDao());
+        return database.getBehanceDao();
+    }
+
+    BehanceDatabase provideDatabase() {
+        return Room.databaseBuilder(mApp, BehanceDatabase.class, "behance_database")
+                .fallbackToDestructiveMigration()
+                .build();
+    }
+
+    BehanceDao provideBehanceDao(BehanceDatabase database) {
+        return database.getBehanceDao();
     }
 }

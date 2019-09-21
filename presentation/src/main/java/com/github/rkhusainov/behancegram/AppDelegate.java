@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.github.rkhusainov.behancegram.di.AppModule;
 import com.github.rkhusainov.behancegram.di.NetworkModule;
+import com.github.rkhusainov.behancegram.di.RepositoryModule;
 
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -18,7 +19,7 @@ public class AppDelegate extends Application {
         super.onCreate();
 
         sAppScope = Toothpick.openScope(AppDelegate.class);
-        sAppScope.installModules(new SmoothieApplicationModule(this), new NetworkModule(), new AppModule(this));
+        sAppScope.installModules(new SmoothieApplicationModule(this), new NetworkModule(), new AppModule(this), new RepositoryModule());
     }
 
     public static Scope getAppScope() {

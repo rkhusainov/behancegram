@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rkhusainov.behancegram.R;
-import com.github.rkhusainov.data.model.project.Project;
+import com.github.rkhusainov.domain.model.project.Project;
 import com.github.rkhusainov.behancegram.databinding.ProjectBinding;
 
 import java.util.List;

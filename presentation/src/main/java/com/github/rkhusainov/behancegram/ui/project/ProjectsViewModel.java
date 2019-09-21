@@ -6,7 +6,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.github.rkhusainov.data.Storage;
 import com.github.rkhusainov.data.api.BehanceApi;
-import com.github.rkhusainov.data.model.project.Project;
+import com.github.rkhusainov.domain.model.project.Project;
 import com.github.rkhusainov.behancegram.utils.ApiUtils;
 
 import javax.inject.Inject;

@@ -1,7 +1,7 @@
 package com.github.rkhusainov.data.api;
 
-import com.github.rkhusainov.data.model.project.ProjectResponse;
-import com.github.rkhusainov.data.model.user.UserResponse;
+import com.github.rkhusainov.domain.model.project.ProjectResponse;
+import com.github.rkhusainov.domain.model.user.UserResponse;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;

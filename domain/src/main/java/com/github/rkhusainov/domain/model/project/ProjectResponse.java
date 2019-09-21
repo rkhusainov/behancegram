@@ -1,4 +1,4 @@
-package com.github.rkhusainov.data.model.project;
+package com.github.rkhusainov.domain.model.project;
 
 import com.google.gson.annotations.SerializedName;
 

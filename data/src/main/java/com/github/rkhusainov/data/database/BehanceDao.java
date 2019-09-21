@@ -5,11 +5,11 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.github.rkhusainov.data.model.project.Cover;
-import com.github.rkhusainov.data.model.project.Owner;
-import com.github.rkhusainov.data.model.project.Project;
-import com.github.rkhusainov.data.model.user.Image;
-import com.github.rkhusainov.data.model.user.User;
+import com.github.rkhusainov.domain.model.project.Cover;
+import com.github.rkhusainov.domain.model.project.Owner;
+import com.github.rkhusainov.domain.model.project.Project;
+import com.github.rkhusainov.domain.model.user.Image;
+import com.github.rkhusainov.domain.model.user.User;
 
 import java.util.List;
 

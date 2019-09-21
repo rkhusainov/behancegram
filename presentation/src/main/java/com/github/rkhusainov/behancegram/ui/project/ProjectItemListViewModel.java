@@ -1,6 +1,6 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
-import com.github.rkhusainov.data.model.project.Project;
+import com.github.rkhusainov.domain.model.project.Project;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
 
 public class ProjectItemListViewModel {

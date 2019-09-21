@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.github.rkhusainov.data.model.project.Project;
+import com.github.rkhusainov.domain.model.project.Project;
 import com.github.rkhusainov.behancegram.ui.project.ProjectsAdapter;
 import com.squareup.picasso.Picasso;
 

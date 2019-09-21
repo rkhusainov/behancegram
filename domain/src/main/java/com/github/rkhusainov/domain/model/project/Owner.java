@@ -1,4 +1,4 @@
-package com.github.rkhusainov.data.model.project;
+package com.github.rkhusainov.domain.model.project;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

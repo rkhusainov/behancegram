@@ -1,13 +1,13 @@
 package com.github.rkhusainov.data;
 
 import com.github.rkhusainov.data.database.BehanceDao;
-import com.github.rkhusainov.data.model.project.Cover;
-import com.github.rkhusainov.data.model.project.Owner;
-import com.github.rkhusainov.data.model.project.Project;
-import com.github.rkhusainov.data.model.project.ProjectResponse;
-import com.github.rkhusainov.data.model.user.Image;
-import com.github.rkhusainov.data.model.user.User;
-import com.github.rkhusainov.data.model.user.UserResponse;
+import com.github.rkhusainov.domain.model.project.Cover;
+import com.github.rkhusainov.domain.model.project.Owner;
+import com.github.rkhusainov.domain.model.project.Project;
+import com.github.rkhusainov.domain.model.project.ProjectResponse;
+import com.github.rkhusainov.domain.model.user.Image;
+import com.github.rkhusainov.domain.model.user.User;
+import com.github.rkhusainov.domain.model.user.UserResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,9 +79,5 @@ public class Storage {
         response.setUser(user);
 
         return response;
-    }
-
-    public interface StorageOwner {
-        Storage obtainStorage();
     }
 }
