@@ -18,6 +18,12 @@ android {
         buildConfigField "String", "API_KEY", '"l7gojXuylIZW3djPk4sEjLzREW64DGnB"'
         buildConfigField "String", "API_QUERY", '"motorcycle"'
 
+//        javaCompileOptions {
+//            annotationProcessorOptions {
+//                arguments = [toothpick_registry_package_name          : 'com.github.rkhusainov.data',
+//                             toothpick_registry_children_package_names: 'com.github.rkhusainov.domain']
+//            }
+//        }
 
     }
 

@@ -1,4 +1,4 @@
-package com.github.rkhusainov.behancegram.utils;
+package com.github.rkhusainov.domain;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;

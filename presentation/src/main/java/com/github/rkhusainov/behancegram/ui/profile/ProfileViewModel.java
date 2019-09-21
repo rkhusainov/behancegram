@@ -4,11 +4,9 @@ import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.github.rkhusainov.data.Storage;
-import com.github.rkhusainov.data.api.BehanceApi;
-import com.github.rkhusainov.domain.model.user.User;
-import com.github.rkhusainov.behancegram.utils.ApiUtils;
 import com.github.rkhusainov.behancegram.utils.DateUtils;
+import com.github.rkhusainov.domain.model.user.User;
+import com.github.rkhusainov.domain.service.ProfileService;
 
 import javax.inject.Inject;
 
@@ -19,9 +17,8 @@ import io.reactivex.schedulers.Schedulers;
 public class ProfileViewModel {
 
     @Inject
-    Storage mStorage;
-    @Inject
-    BehanceApi mApi;
+    ProfileService mService;
+
     private Disposable mDisposable;
     private String mUsername;
     private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
@@ -47,20 +44,15 @@ public class ProfileViewModel {
     }
 
     void loadProfile() {
-        mDisposable = mApi.getUserInfo(mUsername)
+        mDisposable = mService.getUser(mUsername)
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(response -> mStorage.insertUser(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getUser(mUsername) : null)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> isLoading.set(true))
                 .doFinally(() -> isLoading.set(false))
                 .subscribe(userResponse -> {
                     isErrorVisible.set(false);
-                    bindProfileFields(userResponse.getUser());
-                }, throwable -> {
-                    isErrorVisible.set(true);
-                });
+                    bindProfileFields(userResponse);
+                }, throwable -> isErrorVisible.set(true));
     }
 
     private void bindProfileFields(User user) {

@@ -29,14 +29,4 @@ public class AppModule extends Module {
 
         return database.getBehanceDao();
     }
-
-    BehanceDatabase provideDatabase() {
-        return Room.databaseBuilder(mApp, BehanceDatabase.class, "behance_database")
-                .fallbackToDestructiveMigration()
-                .build();
-    }
-
-    BehanceDao provideBehanceDao(BehanceDatabase database) {
-        return database.getBehanceDao();
-    }
 }

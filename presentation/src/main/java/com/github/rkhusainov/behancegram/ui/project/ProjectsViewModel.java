@@ -1,13 +1,13 @@
 package com.github.rkhusainov.behancegram.ui.project;
 
+import android.annotation.SuppressLint;
+
 import androidx.databinding.ObservableArrayList;
 import androidx.databinding.ObservableBoolean;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.github.rkhusainov.data.Storage;
-import com.github.rkhusainov.data.api.BehanceApi;
 import com.github.rkhusainov.domain.model.project.Project;
-import com.github.rkhusainov.behancegram.utils.ApiUtils;
+import com.github.rkhusainov.domain.service.ProjectService;
 
 import javax.inject.Inject;
 
@@ -15,14 +15,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.github.rkhusainov.data.BuildConfig.API_QUERY;
-
 public class ProjectsViewModel {
 
+
     @Inject
-    Storage mStorage;
-    @Inject
-    BehanceApi mApi;
+    ProjectService mService;
 
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
     private Disposable mDisposable;
@@ -42,25 +39,21 @@ public class ProjectsViewModel {
     }
 
 
+    @SuppressLint("CheckResult")
     public void loadProjects() {
-        mDisposable = mApi.getProjects(API_QUERY)
-                .doOnSuccess(response -> mStorage.insertProjects(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
+        mDisposable = mService.getProjects()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(disposable -> mIsLoading.set(true))
                 .doFinally(() -> mIsLoading.set(false))
-                .subscribe(projectResponse -> {
+                .subscribe(response -> {
                             mIsErrorVisible.set(false);
                             if (!mProjects.isEmpty()) {
                                 mProjects.clear();
                             }
-                            mProjects.addAll(projectResponse.getProjects());
+                            mProjects.addAll(response);
                         },
-                        throwable -> {
-                            mIsErrorVisible.set(true);
-                        });
+                        throwable -> mIsErrorVisible.set(true));
     }
 
     public ProjectsAdapter.OnItemClickListener getOnItemClickListener() {
@@ -88,7 +81,6 @@ public class ProjectsViewModel {
     }
 
     public void dispatchDetach() {
-        mStorage = null;
         if (mDisposable != null) {
             mDisposable.dispose();
         }
